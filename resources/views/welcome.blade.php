@@ -223,15 +223,51 @@
           <div class="col-lg-12 d-flex justify-content-center">
 			<div class="button-group filters-button-group">
 				<button class="button is-checked" data-filter="*">All</button>
-				<button class="button" data-filter=".design">Landing Pages</button>
-				<button class="button" data-filter=".development">Corporation Sites</button>
-				<button class="button" data-filter=".marketing">Online Shops</button>
+				@if($rtemplate['projectTypes']->count() == 0)
+					@foreach($rtemplate['projectTypes'] as $pt)
+						<button class="button" data-filter=".$pt->name">{{$pt->name}}</button>
+					@endforeach
+				@else
+					<button class="button" data-filter=".design">Landing Pages</button>
+					<button class="button" data-filter=".development">Corporation Sites</button>
+					<button class="button" data-filter=".marketing">Online Shops</button>
+				@endif
 			</div> <!-- end of button group -->
           </div>
         </div>
 
         <div class="grid portfolio-container">
-		
+		@if($rtemplate['projectTypes']->count() == 0)
+			@foreach($rtemplate['projectTypes'] as $pt)
+				@if($rtemplate['projects']->count() != 0)	
+					@foreach($rtemplate['projects'] as $pj)
+						@if($pj->type == $pt->name)
+						  <div class="col-lg-4 col-md-6 portfolio-item {{$pt->name}}">
+							<div class="portfolio-wrap">
+								@if($rtemplate['projectsImages']->count() != 0)
+									@foreach($rtemplate['projectsImages'] as $pi)
+										@if($pi->ref_class == $pj->name)
+											<img src="{{ asset('storage/'.$pi->imagePath)}}" class="img-fluid" alt="">
+										@endif
+									@endforeach
+							    @else
+									<img src="{{ asset('images/portfolio/portfolio-1.jpg') }}" class="img-fluid" alt="">
+								@endif
+							  <div class="portfolio-info">
+								<h4>{{$pj->name}}</h4>
+								<p>{{$pj->id}}</p>
+								<div class="portfolio-links">
+								  <a href="{{ asset('images/portfolio/portfolio-1.jpg') }}" data-gallery="portfolioGallery" class="portfolio-lightbox" title="App 1"><i class="bx bx-plus"></i></a>
+								  <a href="{{ config('app.url') }}/projectView/1" title="More Details"><i class="bx bx-link"></i></a>
+								</div>
+							  </div>
+							</div>
+						  </div>	
+						@endif
+					@endforeach
+				@endif
+			@endforeach
+		@else
           <div class="col-lg-4 col-md-6 portfolio-item development">
             <div class="portfolio-wrap">
               <img src="{{ asset('images/portfolio/portfolio-1.jpg') }}" class="img-fluid" alt="">
@@ -357,7 +393,7 @@
               </div>
             </div>
           </div>
-
+		@endif
         </div>
       </div>
     </section><!-- End Portfolio Section -->
@@ -420,7 +456,7 @@
 						@if($rtemplate['profilesImages']->count() != 0)
 							@foreach($rtemplate['profilesImages'] as $pi)
 								@if($pi->ref_id == $pf->id)
-									<img src="{{ asset('storage/'.$pi->imagePath)}}"> 
+									<img src="{{ asset('storage/'.$pi->imagePath)}}" alt="Team" class="img-circle avatar-cover"> 
 								@endif
 							@endforeach
 						@else
@@ -428,10 +464,10 @@
 						@endif					
 						
 						<div class="social">
-							<a href=""><i class="bi bi-twitter"></i></a>
-							<a href=""><i class="bi bi-facebook"></i></a>
-							<a href=""><i class="bi bi-instagram"></i></a>
-							<a href=""><i class="bi bi-linkedin"></i></a>
+							<a href="{{$pf->twitter}}"><i class="bi bi-twitter"></i></a>
+							<a href="{{$pf->facebook}}"><i class="bi bi-facebook"></i></a>
+							<a href="{{$pf->instagram}}"><i class="bi bi-instagram"></i></a>
+							<a href="{{$pf->linkedin}}"><i class="bi bi-linkedin"></i></a>
 						</div>				
 						<hgroup class="hgroup-text">
 							<h3><strong>{{$pf->name}}</strong></h3>
@@ -523,7 +559,15 @@
 						@foreach($rtemplate['testimonials'] as $ts)
 							<div class="testimonial">
 								<div class="commenter-thumb">
-									<img src="{{ asset('storage/'.$ts->imagePath)}}" alt="Client Avatar" class="img-responsive"/>
+									@if($rtemplate['testimonialImages']->count() != 0)
+										@foreach($rtemplate['testimonialImages'] as $ti)
+											@if($pi->ref_id == $pf->id)
+												<img src="{{ asset('storage/'.$ti->imagePath)}}" alt="Client Avatar" class="img-responsive"/>
+											@endif
+										@endforeach
+									@else								
+										<img src="images/client/client-avatar.jpg" alt="Client Avatar" class="img-responsive"/>
+									@endif
 								</div>
 								<blockquote>{{ $ts->comment}}</blockquote>
 								<div class="client-info">
@@ -624,6 +668,11 @@
             <div class="container">
                <!--Client logo-->
                <div id="carousel-our-clients" class="owl-carousel text-center margin-top-20">
+				@if($rtemplate['carouselImages']->count() > 5)
+					@foreach($rtemplate['carouselImages'] as $ci)	
+						<div class="our-clients"> <a href="#"> <img src="{{ asset('storage/'.$ci->imagePath)}}" class="img-responsive" alt="" /> </a> </div>
+					@endforeach			   
+			   @else
                   <div class="our-clients"> <a href="#"> <img src="images/client/1.png" class="img-responsive" alt="" /> </a> </div>
                   <div class="our-clients"> <a href="#"> <img src="images/client/2.png" class="img-responsive" alt="" /> </a> </div>
                   <div class="our-clients"> <a href="#"> <img src="images/client/3.png" class="img-responsive" alt="" /> </a> </div>
@@ -636,6 +685,7 @@
                   <div class="our-clients"> <a href="#"> <img src="images/client/10.png" class="img-responsive" alt="" /> </a> </div>
                   <div class="our-clients"> <a href="#"> <img src="images/client/11.png" class="img-responsive" alt="" /> </a> </div>
                </div>
+			   @endif
                <!--/Client logo--> 
             </div>
          </div>
@@ -696,7 +746,7 @@
 						<div class="contactDetails">
 							<div id="map" class="google-map"></div>
 							<h3><strong>Contact Details</strong></h3>
-							@if($rtemplate['appDefaults'])						
+							@if($rtemplate['appDefaults']->count() == 0)						
 								<p>{{$rtemplate['appDefaults']->contactText}}</p>
 								<p> <i class="icon-pin"></i>  {{$rtemplate['appDefaults']->address}}</p>
 								<p> <i class="icon-screen-smartphone"></i>  {{$rtemplate['appDefaults']->phone}}</p>
